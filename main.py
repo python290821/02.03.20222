@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, Response
 import json
 
 app = Flask(__name__)
@@ -41,6 +41,8 @@ def get_or_post_customer():
                     c["address"].find(search_args["address"]) < 0:
                 continue
             results.append(c)
+        if len(results) == 0:
+            return Response("[]", status=404, mimetype='application/json')
         return json.dumps(results)
 
     if request.method == 'POST':
