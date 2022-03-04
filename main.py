@@ -31,7 +31,8 @@ def get_or_post_customer():
         print(request.args.to_dict())
         search_args = request.args.to_dict()
         if len(search_args) == 0:
-            return json.dumps(customers)
+            return Response(json.dumps(customers),
+                            status=200, mimetype='application/json')
         results = []
         for c in customers:
             if "name" in search_args.keys():
@@ -43,13 +44,16 @@ def get_or_post_customer():
             results.append(c)
         if len(results) == 0:
             return Response("[]", status=404, mimetype='application/json')
-        return json.dumps(results)
+        return Response(json.dumps(customers),
+                        status=200, mimetype='application/json')
 
     if request.method == 'POST':
         #  {'id': 4 [not be sent with DB], 'name': 'david', 'address': 'herzeliya'}
         new_customer = request.get_json()
         customers.append(new_customer)
-        return '{"status": "success"}'
+        return Response('"{status": "success",'\
+                        f'"new-item": "{request.url}/{new_customer["id"]}"',
+                        status=201, mimetype='application/json')
 
 @app.route('/customers/<int:id>', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
 def get_customer_by_id(id):
